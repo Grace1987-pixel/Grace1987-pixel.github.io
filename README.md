@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Floating Flowers Background Effect</title>
+  <title>กัญญาภัค เจตนาภิวัฒน์ - Profile</title>
   <style>
     * {
       margin: 0;
@@ -12,7 +12,7 @@
     }
 
     body {
-      font-family: 'Sukhumvit Set', sans-serif, Arial;
+      font-family: 'Sukhumvit Set', 'Prompt', sans-serif, Arial;
       min-height: 100vh;
       display: flex;
       justify-content: center;
@@ -22,27 +22,60 @@
       position: relative;
     }
 
-    /* เนื้อหาหลักด้านหน้า */
-    .content-card {
+    /* การ์ดเนื้อหาหลักด้านหน้า */
+    .profile-card {
       position: relative;
       z-index: 10; /* อยู่ด้านหน้าดอกไม้ */
-      background: rgba(255, 255, 255, 0.85);
-      backdrop-filter: blur(8px);
-      padding: 40px 60px;
-      border-radius: 20px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      background: rgba(255, 255, 255, 0.88);
+      backdrop-filter: blur(10px);
+      padding: 40px;
+      border-radius: 24px;
+      box-shadow: 0 12px 35px rgba(216, 112, 147, 0.15);
       text-align: center;
-      max-width: 500px;
+      max-width: 520px;
+      width: 90%;
+      border: 1px solid rgba(255, 255, 255, 0.6);
     }
 
-    .content-card h1 {
+    .profile-card h1 {
       color: #d87093;
-      margin-bottom: 15px;
+      font-size: 1.8rem;
+      margin-bottom: 8px;
     }
 
-    .content-card p {
-      color: #666;
-      line-height: 1.6;
+    .profile-card .subtitle {
+      color: #8b5a2b;
+      font-weight: 600;
+      font-size: 1.05rem;
+      margin-bottom: 20px;
+      background: #fff5f8;
+      display: inline-block;
+      padding: 6px 16px;
+      border-radius: 20px;
+    }
+
+    .profile-card .info-list {
+      text-align: left;
+      color: #555;
+      line-height: 1.8;
+      margin-bottom: 20px;
+      background: rgba(255, 255, 255, 0.6);
+      padding: 20px;
+      border-radius: 16px;
+    }
+
+    .profile-card .info-list p {
+      margin-bottom: 8px;
+    }
+
+    .profile-card .info-list p:last-child {
+      margin-bottom: 0;
+    }
+
+    .profile-card .skills-title {
+      font-weight: bold;
+      color: #c71585;
+      margin-top: 10px;
     }
 
     /* คอนเทนเนอร์ดอกไม้ด้านหลัง */
@@ -53,7 +86,7 @@
       width: 100%;
       height: 100%;
       pointer-events: none; /* ป้องกันการคลิกทับเนื้อหา */
-      z-index: 1; /* อยู่หลัง content-card */
+      z-index: 1; /* อยู่หลัง profile-card */
       overflow: hidden;
     }
 
@@ -61,7 +94,6 @@
     .floating-flower {
       position: absolute;
       bottom: -80px;
-      font-size: 2rem;
       user-select: none;
       animation: floatUp linear infinite;
       opacity: 0.7;
@@ -73,10 +105,10 @@
         opacity: 0;
       }
       10% {
-        opacity: 0.8;
+        opacity: 0.85;
       }
       90% {
-        opacity: 0.8;
+        opacity: 0.85;
       }
       100% {
         transform: translateY(-110vh) rotate(360deg) scale(1.2);
@@ -91,15 +123,24 @@
   <div class="flower-background" id="flowerContainer"></div>
 
   <!-- เนื้อหาหลัก -->
-  <div class="content-card">
-    <h1>ข้อความอยู่ด้านหน้า</h1>
-    <p>ดอกไม้จะลอยไปมาจากด้านล่างขึ้นด้านบนอยู่ทางด้านหลังของการ์ดนี้อย่างสวยงามและเป็นธรรมชาติ</p>
+  <div class="profile-card">
+    <h1>กัญญาภัค เจตนาภิวัฒน์</h1>
+    <div class="subtitle">คณะสถาปัตยกรรมศาสตร์ สาขาเกมแอนิเมชัน</div>
+
+    <div class="info-list">
+      <p><strong>อายุ:</strong> 21 ปี</p>
+      <p><strong>การศึกษา:</strong> กำลังศึกษาอยู่ชั้นปีที่ 4</p>
+      <p class="skills-title">ความสามารถพิเศษ:</p>
+      <p>• การวาดรูป</p>
+      <p>• การปั้น 3D โมเดล</p>
+      <p>• การออกแบบฉากสิ่งแวดล้อม (Environment Design)</p>
+    </div>
   </div>
 
   <script>
     const container = document.getElementById('flowerContainer');
-    const flowerIcons = ['🌸', '🌺', '🌼', '🌷', '🌹', '🌻', '✨'];
-    const flowerCount = 25; // จำนวนดอกไม้ลอย
+    const flowerIcons = ['🌸', '🌺', '🌼', '🌷', '🌹', '🌻', '✨', '🌿'];
+    const flowerCount = 30; // จำนวนดอกไม้ที่ลอยอยู่ด้านหลัง
 
     for (let i = 0; i < flowerCount; i++) {
       const flower = document.createElement('span');
@@ -108,7 +149,7 @@
       // สุ่มสัญลักษณ์ดอกไม้
       flower.innerText = flowerIcons[Math.floor(Math.random() * flowerIcons.length)];
       
-      // สุ่มตำแหน่งเริ่มต้น horizontal (0% - 100%)
+      // สุ่มตำแหน่งเริ่มต้นตามแนวนอน (0% - 100%)
       flower.style.left = `${Math.random() * 100}%`;
       
       // สุ่มขนาดดอกไม้
