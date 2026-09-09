@@ -239,7 +239,6 @@
 
         // Containers
         const allFlowers = [];
-        const yellowFlowers = [];
         const bees = [];
 
         // Helper: Create Flower
@@ -291,7 +290,7 @@
 
             flowerGroup.position.set(x, 0, z);
             
-            const scale = 0.8 + Math.random() * 0.5;
+            const scale = 0.8 + Math.random() * 0.4;
             flowerGroup.scale.set(scale, scale, scale);
             flowerGroup.rotation.y = Math.random() * Math.PI;
 
@@ -300,36 +299,50 @@
             // Interaction Data
             center.userData = { parentGroup: flowerGroup, isYellow: isYellow };
             
-            // Save references
             allFlowers.push(center);
-            if (isYellow) {
-                yellowFlowers.push(center);
-            }
         }
 
-        // Generate Dense Garden (80 Flowers)
+        // --- NO-OVERLAP PLACEMENT LOGIC (Poisson-like distance checking) ---
+        const flowerPositions = [];
+        const totalFlowers = 75;
+        const minDistance = 1.3; // Minimum distance between flowers to prevent overlap
+        const maxRadius = 12.5;
+
         const pastelColors = [0xf48fb1, 0xce93d8, 0xb39ddb, 0x90caf9, 0x80deea, 0xffab91];
-        
-        // Pick 1 random spot for the single Yellow Flower
-        const yellowIndex = Math.floor(Math.random() * 80);
+        const yellowIndex = Math.floor(Math.random() * totalFlowers);
 
-        for (let i = 0; i < 80; i++) {
-            const angle = Math.random() * Math.PI * 2;
-            const radius = Math.random() * 12.5; // Spread across island
-            const x = Math.sin(angle) * radius;
-            const z = Math.cos(angle) * radius;
+        for (let i = 0; i < totalFlowers; i++) {
+            let placed = false;
+            let attempts = 0;
 
-            if (i === yellowIndex) {
-                // The ONLY Yellow Flower (Special Interactive)
-                createFlower(x, z, 0xffeb3b, true);
-            } else {
-                // Regular Pastel Flowers
-                const color = pastelColors[Math.floor(Math.random() * pastelColors.length)];
-                createFlower(x, z, color, false);
+            while (!placed && attempts < 200) {
+                attempts++;
+                const angle = Math.random() * Math.PI * 2;
+                const radius = Math.sqrt(Math.random()) * maxRadius; // Uniform circle distribution
+                const x = Math.sin(angle) * radius;
+                const z = Math.cos(angle) * radius;
+
+                // Check distance against all previously placed flowers
+                let tooClose = false;
+                for (let pos of flowerPositions) {
+                    const dist = Math.hypot(x - pos.x, z - pos.z);
+                    if (dist < minDistance) {
+                        tooClose = true;
+                        break;
+                    }
+                }
+
+                if (!tooClose) {
+                    flowerPositions.push({ x, z });
+                    const isYellow = (i === yellowIndex);
+                    const color = isYellow ? 0xffeb3b : pastelColors[Math.floor(Math.random() * pastelColors.length)];
+                    createFlower(x, z, color, isYellow);
+                    placed = true;
+                }
             }
         }
 
-        // --- 4. BEE CREATION (WITH FADE OUT EFFECT) ---
+        // --- 4. BEE CREATION (WITH 10-SECOND FADE OUT EFFECT) ---
         function createBee(position) {
             const beeGroup = new THREE.Group();
 
@@ -383,7 +396,7 @@
                 radius: 0.8 + Math.random() * 1.5,
                 centerPos: beeGroup.position.clone(),
                 createdAt: performance.now(),
-                lifespan: 30000 // 30 Seconds Total
+                lifespan: 10000 // Adjusted to 10 Seconds Total
             });
         }
 
@@ -442,7 +455,7 @@
                 const bee = bees[i];
                 const age = now - bee.createdAt;
 
-                // 30-Second Lifetime Logic
+                // 10-Second Lifetime Logic
                 if (age >= bee.lifespan) {
                     // Remove bee from scene
                     scene.remove(bee.mesh);
@@ -458,8 +471,7 @@
                     bee.mesh.scale.addScalar(0.06);
                 }
 
-                // Smooth Fade Out towards the end of lifespan (Fade during last 10 seconds or gradually)
-                // Linear fade across the 30 seconds for gradual effect
+                // Smooth Linear Fade Out across the 10 seconds
                 const remainingRatio = 1 - (age / bee.lifespan); // 1.0 down to 0.0
                 const alpha = Math.max(0, remainingRatio);
 
