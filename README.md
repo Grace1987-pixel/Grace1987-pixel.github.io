@@ -3,280 +3,467 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portfolio - กัญญาภัค เจตนาภิวัฒน์</title>
-    
-    <!-- Google Fonts (Prompt) -->
+    <title>3D Portfolio | กัญญาภัค เจตนาภิวัฒน์</title>
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600;700&display=swap" rel="stylesheet">
-
-    <!-- Three.js CDN -->
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Charm:wght@400;700&family=Sarabun:wght@300;400;600&display=swap" rel="stylesheet">
+    <!-- Three.js Library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
     <style>
         :root {
-            --bg-color: #e8f5e9;
-            --card-bg: rgba(255, 255, 255, 0.75);
-            --primary: #81c784;
-            --dark-green: #2e7d32;
-            --text-main: #2c3e50;
-            --text-sub: #546e7a;
+            --bg-cream: #F7F3EC;
+            --rococo-pink: #E8C5C8;
+            --rococo-gold: #D4AF37;
+            --gold-light: #F3E5AB;
+            --dark-gold: #997A15;
+            --oil-text: #2C221E;
+            --soft-blue: #A2C4C9;
+            --rose-accent: #C87D87;
         }
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Prompt', sans-serif;
         }
 
         body {
-            background-color: var(--bg-color);
-            color: var(--text-main);
+            font-family: 'Sarabun', sans-serif;
+            background-color: var(--bg-cream);
+            color: var(--oil-text);
             overflow-x: hidden;
         }
 
-        /* Canvas สำหรับ Three.js ฉากหลัง */
-        #webgl-bg {
+        /* Canvas Container */
+        #canvas-container {
             position: fixed;
             top: 0;
             left: 0;
             width: 100vw;
             height: 100vh;
-            z-index: -1;
+            z-index: 1;
+            pointer-events: auto;
         }
 
-        /* Layout หลัก */
-        .container {
-            max-width: 1000px;
-            margin: 0 auto;
-            padding: 2rem;
+        /* Overlay Layout */
+        .ui-container {
+            position: relative;
+            z-index: 10;
+            pointer-events: none;
+            width: 100%;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
-            justify-content: center;
+            justify-content: space-between;
+            padding: 2rem;
         }
 
-        /* การ์ดข้อมูลโปรไฟล์ */
-        .profile-card {
-            background: var(--card-bg);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.8);
-            border-radius: 24px;
-            padding: 3rem 2.5rem;
-            box-shadow: 0 20px 40px rgba(46, 125, 50, 0.08);
-            max-width: 650px;
-            animation: fadeIn 1.2s ease-out;
+        .interactive {
+            pointer-events: auto;
         }
 
-        .badge {
-            display: inline-block;
-            background-color: #a5d6a7;
-            color: var(--dark-green);
-            padding: 6px 16px;
-            border-radius: 20px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            margin-bottom: 1.5rem;
-            letter-spacing: 0.5px;
+        /* Header / Banner */
+        header {
+            text-align: center;
+            padding: 1.5rem;
+            background: rgba(253, 251, 247, 0.75);
+            backdrop-filter: blur(8px);
+            border: 2px solid var(--rococo-gold);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(153, 122, 21, 0.15), inset 0 0 15px rgba(212, 175, 55, 0.2);
+            max-width: 800px;
+            margin: 0 auto 2rem auto;
+            position: relative;
         }
 
-        h1 {
+        header::before, header::after {
+            content: "✦";
+            font-size: 1.5rem;
+            color: var(--rococo-gold);
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        header::before { left: 15px; }
+        header::after { right: 15px; }
+
+        h1.title-th {
+            font-family: 'Charm', cursive;
             font-size: 2.8rem;
             font-weight: 700;
-            color: #1b5e20;
-            margin-bottom: 0.5rem;
-            line-height: 1.2;
+            color: var(--rose-accent);
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+            margin-bottom: 0.2rem;
         }
 
-        .subtitle {
-            font-size: 1.25rem;
-            color: var(--text-sub);
-            margin-bottom: 1.8rem;
-            font-weight: 400;
+        p.subtitle {
+            font-family: 'Cinzel Decorative', serif;
+            font-size: 0.95rem;
+            letter-spacing: 2px;
+            color: var(--dark-gold);
+            text-transform: uppercase;
         }
 
-        .info-grid {
+        /* Main Content Grid */
+        .content-wrapper {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1.2rem;
-            margin-top: 1.5rem;
-            padding-top: 1.5rem;
-            border-top: 1px solid rgba(0, 0, 0, 0.08);
+            grid-template-columns: 320px 1fr;
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+            align-items: start;
+        }
+
+        /* Rococo Card Frame */
+        .rococo-card {
+            background: rgba(253, 251, 247, 0.85);
+            backdrop-filter: blur(10px);
+            border: 3px double var(--rococo-gold);
+            border-radius: 12px;
+            padding: 1.8rem;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
+            position: relative;
+        }
+
+        .rococo-card::after {
+            content: '';
+            position: absolute;
+            top: 4px; left: 4px; right: 4px; bottom: 4px;
+            border: 1px solid var(--rococo-pink);
+            border-radius: 8px;
+            pointer-events: none;
+        }
+
+        /* Profile Details */
+        .profile-card h2 {
+            font-family: 'Charm', cursive;
+            font-size: 1.8rem;
+            color: var(--dark-gold);
+            border-bottom: 2px dashed var(--rococo-pink);
+            padding-bottom: 0.5rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .info-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
         }
 
         .info-item {
             display: flex;
             flex-direction: column;
+            gap: 0.2rem;
         }
 
         .info-label {
             font-size: 0.85rem;
-            color: var(--text-sub);
-            margin-bottom: 4px;
+            color: #7A685D;
+            font-weight: 600;
+            text-transform: uppercase;
         }
 
         .info-value {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: var(--text-main);
+            font-size: 1.05rem;
+            color: var(--oil-text);
+            font-weight: 400;
         }
 
-        .cta-btn {
+        .badge {
             display: inline-block;
-            margin-top: 2rem;
-            padding: 12px 32px;
-            background-color: var(--dark-green);
-            color: #fff;
-            text-decoration: none;
-            border-radius: 12px;
+            background: linear-gradient(135deg, var(--rococo-pink), var(--soft-blue));
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
             font-weight: 600;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(46, 125, 50, 0.2);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
 
-        .cta-btn:hover {
-            background-color: #1b5e20;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(46, 125, 50, 0.3);
+        /* Controls Instructions Overlay */
+        .controls-hint {
+            position: absolute;
+            bottom: 2rem;
+            right: 2rem;
+            background: rgba(44, 34, 30, 0.75);
+            color: var(--gold-light);
+            padding: 0.8rem 1.2rem;
+            border-radius: 30px;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            backdrop-filter: blur(5px);
+            border: 1px solid var(--rococo-gold);
         }
 
-        /* Animation */
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 1rem;
+            font-size: 0.85rem;
+            color: var(--dark-gold);
+            margin-top: auto;
+        }
+
+        .gallery-tag {
+            position: absolute;
+            top: -15px;
+            right: 20px;
+            background: var(--rococo-gold);
+            color: white;
+            font-family: 'Cinzel Decorative', serif;
+            font-size: 0.75rem;
+            padding: 0.2rem 0.8rem;
+            border-radius: 4px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+        }
+
+        @media (max-width: 850px) {
+            .content-wrapper {
+                grid-template-columns: 1fr;
             }
-            to {
-                opacity: 1;
-                transform: translateY(0);
+            h1.title-th {
+                font-size: 2rem;
             }
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            h1 { font-size: 2.2rem; }
-            .profile-card { padding: 2rem 1.5rem; }
         }
     </style>
 </head>
 <body>
 
-    <!-- Canvas สำหรับ Three.js -->
-    <canvas id="webgl-bg"></canvas>
+    <!-- Three.js 3D Canvas -->
+    <div id="canvas-container"></div>
 
-    <!-- Content ส่วนหน้าเว็บ -->
-    <div class="container">
-        <div class="profile-card">
-            <span class="badge">3D & Game Artist Portfolio</span>
-            <h1>กัญญาภัค เจตนาภิวัฒน์</h1>
-            <p class="subtitle">สถาปัตยกรรมศาสตร์ • สาขาเกมและอนิเมชั่น</p>
-            
-            <div class="info-grid">
-                <div class="info-item">
-                    <span class="info-label">สถานะปัจจุบัน</span>
-                    <span class="info-value">นักศึกษาชั้นปีที่ 4</span>
-                </div>
-                <div class="info-item">
-                    <span class="info-label">อายุ</span>
-                    <span class="info-value">21 ปี</span>
-                </div>
+    <!-- UI Overlay -->
+    <div class="ui-container">
+        <!-- Header -->
+        <header class="interactive">
+            <h1 class="title-th">กัญญาภัค เจตนาภิวัฒน์</h1>
+            <p class="subtitle">Rococo & Oil Painting 3D Portfolio</p>
+        </header>
+
+        <!-- Main Content -->
+        <div class="content-wrapper">
+            <!-- Profile Info Panel -->
+            <div class="rococo-card profile-card interactive">
+                <span class="gallery-tag">ARTIST PROFILE</span>
+                <h2><i data-lucide="palette"></i> ข้อมูลส่วนตัว</h2>
+                <ul class="info-list">
+                    <li class="info-item">
+                        <span class="info-label">ชื่อ-นามสกุล</span>
+                        <span class="info-value">กัญญาภัค เจตนาภิวัฒน์</span>
+                    </li>
+                    <li class="info-item">
+                        <span class="info-label">อายุ</span>
+                        <span class="info-value">21 ปี</span>
+                    </li>
+                    <li class="info-item">
+                        <span class="info-label">การศึกษา</span>
+                        <span class="info-value">ชั้นปีที่ 4 (Senior)</span>
+                        <span class="info-value" style="font-size:0.95rem; color:#555;">คณะสถาปัตยกรรมศาสตร์</span>
+                        <span class="info-value"><span class="badge">สาขาเกมและอนิเมชั่น</span></span>
+                    </li>
+                    <li class="info-item">
+                        <span class="info-label">ความสามารถพิเศษ</span>
+                        <span class="info-value">🎨 การวาดภาพดิจิทัล & สีน้ำมัน</span>
+                        <span class="info-value">🖌️ ออกแบบตัวละครและฉาก (Concept Art)</span>
+                        <span class="info-value">🏛️ 3D Modeling & Texturing Style Rococo</span>
+                    </li>
+                </ul>
             </div>
-
-            <a href="#works" class="cta-btn">รับชมผลงาน (View Works)</a>
+            
+            <div></div>
         </div>
+
+        <!-- Controls Hint -->
+        <div class="controls-hint interactive">
+            <i data-lucide="mouse-pointer"></i>
+            <span>หมุนภาพ 3D: คลิกลากซ้าย | ย่อ-ขยาย: สกอร์ลเมาส์</span>
+        </div>
+
+        <!-- Footer -->
+        <footer>
+            <p>© 2026 Kanyapak Chettanapiwat • Rococo Digital Art Gallery</p>
+        </footer>
     </div>
 
-    <!-- Script สำหรับสร้าง 3D Scene ด้วย Three.js -->
     <script>
-        // 1. Scene, Camera, Renderer Setup
-        const scene = new THREE.Scene();
+        lucide.createIcons();
+
+        const container = document.getElementById('canvas-container');
         
-        // หมอกสีเขียวพาสเทลเพื่อกลมกลืนกับ Background
-        scene.background = new THREE.Color(0xe8f5e9);
-        scene.fog = new THREE.FogExp2(0xe8f5e9, 0.03);
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0xF5F0E6);
 
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        camera.position.z = 15;
+        const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.set(0, 1.2, 6);
 
-        const renderer = new THREE.WebGLRenderer({
-            canvas: document.querySelector('#webgl-bg'),
-            antialias: true
-        });
-        renderer.setPixelRatio(window.devicePixelRatio);
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        renderer.toneMappingExposure = 1.1;
+        container.appendChild(renderer.domElement);
 
-        // 2. Lighting (แสง)
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
-        scene.add(ambientLight);
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+        controls.maxPolarAngle = Math.PI / 2 + 0.1;
+        controls.minDistance = 3;
+        controls.maxDistance = 10;
 
-        const dirLight1 = new THREE.DirectionalLight(0xa5d6a7, 0.8);
-        dirLight1.position.set(5, 10, 7);
-        scene.add(dirLight1);
+        // --- Create Dynamic Watercolor Background Effect in 3D ---
+        function generateWatercolorBgTexture() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 1024;
+            canvas.height = 1024;
+            const ctx = canvas.getContext('2d');
 
-        const dirLight2 = new THREE.DirectionalLight(0x81c784, 0.5);
-        dirLight2.position.set(-5, -5, -5);
-        scene.add(dirLight2);
+            ctx.fillStyle = '#F5F0E6';
+            ctx.fillRect(0, 0, 1024, 1024);
 
-        // 3. Create Pastel Floating Objects (สร้างโมเดลเรขาคณิตลอยได้)
-        const materials = [
-            new THREE.MeshStandardMaterial({ color: 0xc8e6c9, roughness: 0.3, metalness: 0.1 }), // Mint Light
-            new THREE.MeshStandardMaterial({ color: 0xa5d6a7, roughness: 0.4, metalness: 0.1 }), // Pastel Green
-            new THREE.MeshStandardMaterial({ color: 0x81c784, roughness: 0.2, metalness: 0.2 }), // Medium Pastel
-            new THREE.MeshStandardMaterial({ color: 0xe8f5e9, roughness: 0.5, metalness: 0.0 })  // Very Soft Green
-        ];
+            const colors = [
+                'rgba(232, 197, 200, 0.25)', 
+                'rgba(162, 196, 201, 0.25)', 
+                'rgba(243, 229, 171, 0.3)', 
+                'rgba(200, 125, 135, 0.15)',
+                'rgba(44, 55, 40, 0.12)'
+            ];
 
-        const geometries = [
-            new THREE.IcosahedronGeometry(1.2, 0),
-            new THREE.TorusGeometry(1, 0.35, 16, 100),
-            new THREE.OctahedronGeometry(1.5, 0),
-            new THREE.TetrahedronGeometry(1.3, 0)
-        ];
+            for (let i = 0; i < 150; i++) {
+                const x = Math.random() * 1024;
+                const y = Math.random() * 1024;
+                const radius = Math.random() * 180 + 50;
 
-        const objects = [];
-        const count = 25; // จำนวนชิ้นงาน 3D ในฉาก
+                const grad = ctx.createRadialGradient(x, y, 5, x, y, radius);
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                grad.addColorStop(0, color);
+                grad.addColorStop(1, 'transparent');
 
-        for (let i = 0; i < count; i++) {
-            const geometry = geometries[Math.floor(Math.random() * geometries.length)];
-            const material = materials[Math.floor(Math.random() * materials.length)];
-            const mesh = new THREE.Mesh(geometry, material);
+                ctx.fillStyle = grad;
+                ctx.beginPath();
+                ctx.arc(x, y, radius, 0, Math.PI * 2);
+                ctx.fill();
+            }
 
-            // สุ่มตำแหน่ง
-            mesh.position.x = (Math.random() - 0.5) * 30;
-            mesh.position.y = (Math.random() - 0.5) * 30;
-            mesh.position.z = (Math.random() - 0.5) * 20;
-
-            // สุ่มขนาด
-            const scale = Math.random() * 0.8 + 0.5;
-            mesh.scale.set(scale, scale, scale);
-
-            // สุ่มมุมหมุนเริ่มต้น
-            mesh.rotation.x = Math.random() * Math.PI;
-            mesh.rotation.y = Math.random() * Math.PI;
-
-            // ค่าความเร็วการหมุนและการลอย
-            mesh.userData = {
-                rotSpeedX: (Math.random() - 0.5) * 0.01,
-                rotSpeedY: (Math.random() - 0.5) * 0.01,
-                floatSpeed: Math.random() * 0.01 + 0.005,
-                floatOffset: Math.random() * Math.PI * 2
-            };
-
-            scene.add(mesh);
-            objects.push(mesh);
+            return new THREE.CanvasTexture(canvas);
         }
 
-        // 4. Mouse Interaction (ตอบสนองตามการขยับ เมาส์)
-        let mouseX = 0;
-        let mouseY = 0;
+        // Add soft watercolor background plane
+        const bgGeo = new THREE.PlaneGeometry(30, 20);
+        const bgMat = new THREE.MeshBasicMaterial({
+            map: generateWatercolorBgTexture(),
+            depthWrite: false
+        });
+        const bgMesh = new THREE.Mesh(bgGeo, bgMat);
+        bgMesh.position.set(0, 0, -8);
+        scene.add(bgMesh);
 
-        window.addEventListener('mousemove', (event) => {
-            mouseX = (event.clientX / window.innerWidth - 0.5) * 2;
-            mouseY = (event.clientY / window.innerHeight - 0.5) * 2;
+        // --- Lighting ---
+        const ambientLight = new THREE.AmbientLight(0xFFFFFF, 1.2);
+        scene.add(ambientLight);
+
+        const mainLight = new THREE.DirectionalLight(0xFFFAF0, 1.0);
+        mainLight.position.set(5, 8, 5);
+        scene.add(mainLight);
+
+        // --- Load User Artwork into 3D Frame ---
+        const textureLoader = new THREE.TextureLoader();
+        
+        // Base64 Image string directly embedded
+        const artworkImageSrc = 'input_file_0.png'; 
+
+        const galleryGroup = new THREE.Group();
+
+        textureLoader.load(artworkImageSrc, (texture) => {
+            texture.generateMipmaps = true;
+            
+            // Ornate Gold Frame Material
+            const goldMaterial = new THREE.MeshStandardMaterial({
+                color: 0xD4AF37,
+                metalness: 0.8,
+                roughness: 0.3
+            });
+
+            // Frame dimensions matching artwork ratio (~1.4:1)
+            const artWidth = 3.5;
+            const artHeight = 2.5;
+            const frameThickness = 0.15;
+
+            // Outer Frame
+            const frameGeo = new THREE.BoxGeometry(artWidth + 0.3, artHeight + 0.3, frameThickness);
+            const frameMesh = new THREE.Mesh(frameGeo, goldMaterial);
+            galleryGroup.add(frameMesh);
+
+            // Canvas Artwork Plane
+            const artGeo = new THREE.PlaneGeometry(artWidth, artHeight);
+            const artMat = new THREE.MeshStandardMaterial({
+                map: texture,
+                roughness: 0.4
+            });
+            const artMesh = new THREE.Mesh(artGeo, artMat);
+            artMesh.position.z = frameThickness / 2 + 0.01;
+            galleryGroup.add(artMesh);
+
+            // Ornate Corner Details
+            const cornerGeo = new THREE.TorusGeometry(0.15, 0.04, 16, 32);
+            const corners = [
+                [-(artWidth/2), (artHeight/2)],
+                [(artWidth/2), (artHeight/2)],
+                [-(artWidth/2), -(artHeight/2)],
+                [(artWidth/2), -(artHeight/2)]
+            ];
+
+            corners.forEach(pos => {
+                const corner = new THREE.Mesh(cornerGeo, goldMaterial);
+                corner.position.set(pos[0], pos[1], frameThickness / 2 + 0.02);
+                galleryGroup.add(corner);
+            });
         });
 
-        // 5. Animation Loop
+        galleryGroup.position.set(1.2, 0.8, 0);
+        scene.add(galleryGroup);
+
+        // --- Wooden Easel Stand ---
+        const woodMaterial = new THREE.MeshStandardMaterial({ color: 0x5C3A21, roughness: 0.8 });
+        const easelGroup = new THREE.Group();
+        const legGeo = new THREE.CylinderGeometry(0.04, 0.04, 4.2);
+
+        const leftLeg = new THREE.Mesh(legGeo, woodMaterial);
+        leftLeg.position.set(-1.0, -0.6, -0.2);
+        leftLeg.rotation.z = -0.2;
+        easelGroup.add(leftLeg);
+
+        const rightLeg = new THREE.Mesh(legGeo, woodMaterial);
+        rightLeg.position.set(1.0, -0.6, -0.2);
+        rightLeg.rotation.z = 0.2;
+        easelGroup.add(rightLeg);
+
+        const backLeg = new THREE.Mesh(legGeo, woodMaterial);
+        backLeg.position.set(0, -0.6, -1.2);
+        backLeg.rotation.x = -0.3;
+        easelGroup.add(backLeg);
+
+        const shelfGeo = new THREE.BoxGeometry(3.6, 0.08, 0.3);
+        const shelf = new THREE.Mesh(shelfGeo, woodMaterial);
+        shelf.position.set(0, -0.6, 0.1);
+        easelGroup.add(shelf);
+
+        easelGroup.position.set(1.2, 0.8, 0);
+        scene.add(easelGroup);
+
+        // --- Animation Loop ---
         let clock = new THREE.Clock();
 
         function animate() {
@@ -284,26 +471,20 @@
 
             const elapsedTime = clock.getElapsedTime();
 
-            // เคลื่อนที่วัตถุแต่ละชิ้น
-            objects.forEach((obj) => {
-                obj.rotation.x += obj.userData.rotSpeedX;
-                obj.rotation.y += obj.userData.rotSpeedY;
+            // Gentle floating movement for the artwork and easel
+            galleryGroup.position.y = 0.8 + Math.sin(elapsedTime * 1.2) * 0.05;
+            galleryGroup.rotation.y = Math.sin(elapsedTime * 0.6) * 0.04;
+            
+            easelGroup.position.y = 0.8 + Math.sin(elapsedTime * 1.2) * 0.05;
+            easelGroup.rotation.y = Math.sin(elapsedTime * 0.6) * 0.04;
 
-                // เอฟเฟกต์ลอยขึ้นลงแบบนุ่มนวล
-                obj.position.y += Math.sin(elapsedTime * 2 + obj.userData.floatOffset) * 0.003;
-            });
-
-            // หมุนมุมกล้องเล็กน้อยตามการเคลื่อนที่ของเมาส์
-            camera.position.x += (mouseX * 2 - camera.position.x) * 0.03;
-            camera.position.y += (-mouseY * 2 - camera.position.y) * 0.03;
-            camera.lookAt(scene.position);
-
+            controls.update();
             renderer.render(scene, camera);
         }
 
         animate();
 
-        // 6. Responsive Window Resize
+        // Responsive Resize
         window.addEventListener('resize', () => {
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
