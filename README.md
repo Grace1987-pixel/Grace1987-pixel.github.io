@@ -3,467 +3,345 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3D Portfolio | กัญญาภัค เจตนาภิวัฒน์</title>
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Charm:wght@400;700&family=Sarabun:wght@300;400;600&display=swap" rel="stylesheet">
-    <!-- Three.js Library -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
-    <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
-    
+    <title>3D Portfolio - กัญญาภัค เจตนาภิวัฒน์</title>
     <style>
-        :root {
-            --bg-cream: #F7F3EC;
-            --rococo-pink: #E8C5C8;
-            --rococo-gold: #D4AF37;
-            --gold-light: #F3E5AB;
-            --dark-gold: #997A15;
-            --oil-text: #2C221E;
-            --soft-blue: #A2C4C9;
-            --rose-accent: #C87D87;
-        }
+        @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap');
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            font-family: 'Kanit', sans-serif;
         }
 
         body {
-            font-family: 'Sarabun', sans-serif;
-            background-color: var(--bg-cream);
-            color: var(--oil-text);
-            overflow-x: hidden;
+            overflow: hidden;
+            background-color: #fce4ec;
+            color: #5d4037;
         }
 
-        /* Canvas Container */
         #canvas-container {
-            position: fixed;
-            top: 0;
-            left: 0;
             width: 100vw;
             height: 100vh;
+            position: absolute;
+            top: 0;
+            left: 0;
             z-index: 1;
-            pointer-events: auto;
         }
 
-        /* Overlay Layout */
-        .ui-container {
-            position: relative;
+        /* Profile Card Overlay */
+        .profile-card {
+            position: absolute;
+            top: 30px;
+            left: 30px;
             z-index: 10;
-            pointer-events: none;
-            width: 100%;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            padding: 2rem;
-        }
-
-        .interactive {
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            padding: 25px 30px;
+            border-radius: 24px;
+            box-shadow: 0 8px 32px 0 rgba(225, 190, 231, 0.37);
+            border: 2px solid rgba(255, 255, 255, 0.8);
+            max-width: 380px;
             pointer-events: auto;
         }
 
-        /* Header / Banner */
-        header {
-            text-align: center;
-            padding: 1.5rem;
-            background: rgba(253, 251, 247, 0.75);
-            backdrop-filter: blur(8px);
-            border: 2px solid var(--rococo-gold);
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(153, 122, 21, 0.15), inset 0 0 15px rgba(212, 175, 55, 0.2);
-            max-width: 800px;
-            margin: 0 auto 2rem auto;
-            position: relative;
-        }
-
-        header::before, header::after {
-            content: "✦";
-            font-size: 1.5rem;
-            color: var(--rococo-gold);
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-        }
-
-        header::before { left: 15px; }
-        header::after { right: 15px; }
-
-        h1.title-th {
-            font-family: 'Charm', cursive;
-            font-size: 2.8rem;
-            font-weight: 700;
-            color: var(--rose-accent);
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
-            margin-bottom: 0.2rem;
-        }
-
-        p.subtitle {
-            font-family: 'Cinzel Decorative', serif;
-            font-size: 0.95rem;
-            letter-spacing: 2px;
-            color: var(--dark-gold);
-            text-transform: uppercase;
-        }
-
-        /* Main Content Grid */
-        .content-wrapper {
-            display: grid;
-            grid-template-columns: 320px 1fr;
-            gap: 2rem;
-            max-width: 1200px;
-            margin: 0 auto;
-            width: 100%;
-            align-items: start;
-        }
-
-        /* Rococo Card Frame */
-        .rococo-card {
-            background: rgba(253, 251, 247, 0.85);
-            backdrop-filter: blur(10px);
-            border: 3px double var(--rococo-gold);
-            border-radius: 12px;
-            padding: 1.8rem;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
-            position: relative;
-        }
-
-        .rococo-card::after {
-            content: '';
-            position: absolute;
-            top: 4px; left: 4px; right: 4px; bottom: 4px;
-            border: 1px solid var(--rococo-pink);
-            border-radius: 8px;
-            pointer-events: none;
-        }
-
-        /* Profile Details */
-        .profile-card h2 {
-            font-family: 'Charm', cursive;
-            font-size: 1.8rem;
-            color: var(--dark-gold);
-            border-bottom: 2px dashed var(--rococo-pink);
-            padding-bottom: 0.5rem;
-            margin-bottom: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .info-list {
-            list-style: none;
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-        }
-
-        .info-item {
-            display: flex;
-            flex-direction: column;
-            gap: 0.2rem;
-        }
-
-        .info-label {
-            font-size: 0.85rem;
-            color: #7A685D;
+        h1 {
+            font-size: 24px;
+            color: #8e24aa;
+            margin-bottom: 5px;
             font-weight: 600;
-            text-transform: uppercase;
         }
 
-        .info-value {
-            font-size: 1.05rem;
-            color: var(--oil-text);
+        h2 {
+            font-size: 16px;
+            color: #ec407a;
+            margin-bottom: 15px;
             font-weight: 400;
         }
 
-        .badge {
-            display: inline-block;
-            background: linear-gradient(135deg, var(--rococo-pink), var(--soft-blue));
-            color: white;
-            padding: 0.3rem 0.8rem;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        .info-group {
+            margin-bottom: 12px;
+            font-size: 14px;
+            line-height: 1.6;
+            color: #4a148c;
         }
 
-        /* Controls Instructions Overlay */
-        .controls-hint {
-            position: absolute;
-            bottom: 2rem;
-            right: 2rem;
-            background: rgba(44, 34, 30, 0.75);
-            color: var(--gold-light);
-            padding: 0.8rem 1.2rem;
-            border-radius: 30px;
-            font-size: 0.85rem;
+        .skills-tag {
             display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            backdrop-filter: blur(5px);
-            border: 1px solid var(--rococo-gold);
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 15px;
         }
 
-        /* Footer */
-        footer {
-            text-align: center;
-            padding: 1rem;
-            font-size: 0.85rem;
-            color: var(--dark-gold);
-            margin-top: auto;
+        .tag {
+            background-color: #f3e5f5;
+            color: #ab47bc;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: 600;
+            border: 1px solid #e1bee7;
         }
 
-        .gallery-tag {
+        .hint {
             position: absolute;
-            top: -15px;
-            right: 20px;
-            background: var(--rococo-gold);
-            color: white;
-            font-family: 'Cinzel Decorative', serif;
-            font-size: 0.75rem;
-            padding: 0.2rem 0.8rem;
-            border-radius: 4px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 14px;
+            color: #d81b60;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            pointer-events: none;
+            animation: bounce 2s infinite;
         }
 
-        @media (max-width: 850px) {
-            .content-wrapper {
-                grid-template-columns: 1fr;
-            }
-            h1.title-th {
-                font-size: 2rem;
-            }
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {transform: translateX(-50%) translateY(0);}
+            40% {transform: translateX(-50%) translateY(-10px);}
+            60% {transform: translateX(-50%) translateY(-5px);}
         }
     </style>
 </head>
 <body>
 
-    <!-- Three.js 3D Canvas -->
-    <div id="canvas-container"></div>
-
     <!-- UI Overlay -->
-    <div class="ui-container">
-        <!-- Header -->
-        <header class="interactive">
-            <h1 class="title-th">กัญญาภัค เจตนาภิวัฒน์</h1>
-            <p class="subtitle">Rococo & Oil Painting 3D Portfolio</p>
-        </header>
-
-        <!-- Main Content -->
-        <div class="content-wrapper">
-            <!-- Profile Info Panel -->
-            <div class="rococo-card profile-card interactive">
-                <span class="gallery-tag">ARTIST PROFILE</span>
-                <h2><i data-lucide="palette"></i> ข้อมูลส่วนตัว</h2>
-                <ul class="info-list">
-                    <li class="info-item">
-                        <span class="info-label">ชื่อ-นามสกุล</span>
-                        <span class="info-value">กัญญาภัค เจตนาภิวัฒน์</span>
-                    </li>
-                    <li class="info-item">
-                        <span class="info-label">อายุ</span>
-                        <span class="info-value">21 ปี</span>
-                    </li>
-                    <li class="info-item">
-                        <span class="info-label">การศึกษา</span>
-                        <span class="info-value">ชั้นปีที่ 4 (Senior)</span>
-                        <span class="info-value" style="font-size:0.95rem; color:#555;">คณะสถาปัตยกรรมศาสตร์</span>
-                        <span class="info-value"><span class="badge">สาขาเกมและอนิเมชั่น</span></span>
-                    </li>
-                    <li class="info-item">
-                        <span class="info-label">ความสามารถพิเศษ</span>
-                        <span class="info-value">🎨 การวาดภาพดิจิทัล & สีน้ำมัน</span>
-                        <span class="info-value">🖌️ ออกแบบตัวละครและฉาก (Concept Art)</span>
-                        <span class="info-value">🏛️ 3D Modeling & Texturing Style Rococo</span>
-                    </li>
-                </ul>
-            </div>
-            
-            <div></div>
+    <div class="profile-card">
+        <h1>กัญญาภัค เจตนาภิวัฒน์</h1>
+        <h2>Portfolio & 3D Showcase</h2>
+        
+        <div class="info-group">
+            <p><strong>อายุ:</strong> 21 ปี</p>
+            <p><strong>การศึกษา:</strong> นิสิตชั้นปีที่ 4</p>
+            <p>คณะสถาปัตยกรรมศาสตร์ สาขาเกมและอนิเมชัน</p>
         </div>
 
-        <!-- Controls Hint -->
-        <div class="controls-hint interactive">
-            <i data-lucide="mouse-pointer"></i>
-            <span>หมุนภาพ 3D: คลิกลากซ้าย | ย่อ-ขยาย: สกอร์ลเมาส์</span>
+        <div class="skills-tag">
+            <span class="tag">🎨 2D/3D Drawing</span>
+            <span class="tag">🗿 3D Modeling</span>
+            <span class="tag">🏞️ Environment Design</span>
         </div>
-
-        <!-- Footer -->
-        <footer>
-            <p>© 2026 Kanyapak Chettanapiwat • Rococo Digital Art Gallery</p>
-        </footer>
     </div>
 
-    <script>
-        lucide.createIcons();
+    <div class="hint">🌸 คลิกที่ดอกไม้เพื่อปล่อยผึ้งตัวน้อย! 🐝</div>
 
+    <div id="canvas-container"></div>
+
+    <!-- Import Three.js and OrbitControls -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+
+    <script>
+        // --- 1. SET UP SCENE, CAMERA, RENDERER ---
         const container = document.getElementById('canvas-container');
-        
         const scene = new THREE.Scene();
-        scene.background = new THREE.Color(0xF5F0E6);
+        
+        // Soft Pastel Fog & Background
+        scene.background = new THREE.Color(0xfce4ec); 
+        scene.fog = new THREE.FogExp2(0xfce4ec, 0.03);
 
         const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
-        camera.position.set(0, 1.2, 6);
+        camera.position.set(0, 8, 18);
 
         const renderer = new THREE.WebGLRenderer({ antialias: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-        renderer.toneMapping = THREE.ACESFilmicToneMapping;
-        renderer.toneMappingExposure = 1.1;
+        renderer.setPixelRatio(window.devicePixelRatio);
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
         container.appendChild(renderer.domElement);
 
         const controls = new THREE.OrbitControls(camera, renderer.domElement);
         controls.enableDamping = true;
-        controls.dampingFactor = 0.05;
-        controls.maxPolarAngle = Math.PI / 2 + 0.1;
-        controls.minDistance = 3;
-        controls.maxDistance = 10;
+        controls.maxPolarAngle = Math.PI / 2 - 0.05; // ไม่ให้มุมกล้องมุดลงใต้พื้น
+        controls.minDistance = 5;
+        controls.maxDistance = 30;
 
-        // --- Create Dynamic Watercolor Background Effect in 3D ---
-        function generateWatercolorBgTexture() {
-            const canvas = document.createElement('canvas');
-            canvas.width = 1024;
-            canvas.height = 1024;
-            const ctx = canvas.getContext('2d');
-
-            ctx.fillStyle = '#F5F0E6';
-            ctx.fillRect(0, 0, 1024, 1024);
-
-            const colors = [
-                'rgba(232, 197, 200, 0.25)', 
-                'rgba(162, 196, 201, 0.25)', 
-                'rgba(243, 229, 171, 0.3)', 
-                'rgba(200, 125, 135, 0.15)',
-                'rgba(44, 55, 40, 0.12)'
-            ];
-
-            for (let i = 0; i < 150; i++) {
-                const x = Math.random() * 1024;
-                const y = Math.random() * 1024;
-                const radius = Math.random() * 180 + 50;
-
-                const grad = ctx.createRadialGradient(x, y, 5, x, y, radius);
-                const color = colors[Math.floor(Math.random() * colors.length)];
-                grad.addColorStop(0, color);
-                grad.addColorStop(1, 'transparent');
-
-                ctx.fillStyle = grad;
-                ctx.beginPath();
-                ctx.arc(x, y, radius, 0, Math.PI * 2);
-                ctx.fill();
-            }
-
-            return new THREE.CanvasTexture(canvas);
-        }
-
-        // Add soft watercolor background plane
-        const bgGeo = new THREE.PlaneGeometry(30, 20);
-        const bgMat = new THREE.MeshBasicMaterial({
-            map: generateWatercolorBgTexture(),
-            depthWrite: false
-        });
-        const bgMesh = new THREE.Mesh(bgGeo, bgMat);
-        bgMesh.position.set(0, 0, -8);
-        scene.add(bgMesh);
-
-        // --- Lighting ---
-        const ambientLight = new THREE.AmbientLight(0xFFFFFF, 1.2);
+        // --- 2. LIGHTS ---
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
         scene.add(ambientLight);
 
-        const mainLight = new THREE.DirectionalLight(0xFFFAF0, 1.0);
-        mainLight.position.set(5, 8, 5);
-        scene.add(mainLight);
+        const dirLight = new THREE.DirectionalLight(0xfff5e6, 0.8);
+        dirLight.position.set(10, 20, 10);
+        dirLight.castShadow = true;
+        dirLight.shadow.mapSize.width = 2048;
+        dirLight.shadow.mapSize.height = 2048;
+        scene.add(dirLight);
 
-        // --- Load User Artwork into 3D Frame ---
-        const textureLoader = new THREE.TextureLoader();
-        
-        // Base64 Image string directly embedded
-        const artworkImageSrc = 'input_file_0.png'; 
+        // --- 3. ENVIRONMENT (PASTEL GARDEN) ---
+        // Ground (Soft Green Island)
+        const groundGeo = new THREE.CylinderGeometry(10, 10, 1, 64);
+        const groundMat = new THREE.MeshStandardMaterial({ color: 0xc8e6c9, roughness: 0.8 });
+        const ground = new THREE.Mesh(groundGeo, groundMat);
+        ground.position.y = -0.5;
+        ground.receiveShadow = true;
+        scene.add(ground);
 
-        const galleryGroup = new THREE.Group();
+        // Flowers & Bees Container
+        const flowers = [];
+        const bees = [];
 
-        textureLoader.load(artworkImageSrc, (texture) => {
-            texture.generateMipmaps = true;
+        // Helper: Create Simple Pastel Flower
+        function createFlower(x, z, petalColor) {
+            const flowerGroup = new THREE.Group();
+
+            // Stem
+            const stemGeo = new THREE.CylinderGeometry(0.05, 0.05, 1.5);
+            const stemMat = new THREE.MeshStandardMaterial({ color: 0xa5d6a7 });
+            const stem = new THREE.Mesh(stemGeo, stemMat);
+            stem.position.y = 0.75;
+            stem.castShadow = true;
+            flowerGroup.add(stem);
+
+            // Center
+            const centerGeo = new THREE.SphereGeometry(0.2, 16, 16);
+            const centerMat = new THREE.MeshStandardMaterial({ color: 0xffe082 });
+            const center = new THREE.Mesh(centerGeo, centerMat);
+            center.position.y = 1.5;
+            center.castShadow = true;
+            flowerGroup.add(center);
+
+            // Petals
+            const petalCount = 5;
+            const petalGeo = new THREE.SphereGeometry(0.25, 16, 16);
+            petalGeo.scale(1, 0.3, 1.8);
+            const petalMat = new THREE.MeshStandardMaterial({ color: petalColor, roughness: 0.5 });
+
+            for (let i = 0; i < petalCount; i++) {
+                const petal = new THREE.Mesh(petalGeo, petalMat);
+                const angle = (i / petalCount) * Math.PI * 2;
+                petal.position.set(
+                    Math.sin(angle) * 0.35,
+                    1.5,
+                    Math.cos(angle) * 0.35
+                );
+                petal.rotation.y = angle;
+                petal.rotation.x = 0.2;
+                petal.castShadow = true;
+                flowerGroup.add(petal);
+            }
+
+            flowerGroup.position.set(x, 0, z);
             
-            // Ornate Gold Frame Material
-            const goldMaterial = new THREE.MeshStandardMaterial({
-                color: 0xD4AF37,
-                metalness: 0.8,
-                roughness: 0.3
+            // Random Scale & Rotation for natural look
+            const scale = 0.8 + Math.random() * 0.5;
+            flowerGroup.scale.set(scale, scale, scale);
+            flowerGroup.rotation.y = Math.random() * Math.PI;
+
+            scene.add(flowerGroup);
+            
+            // Store reference for Raycasting
+            center.userData = { parentGroup: flowerGroup };
+            flowers.push(center);
+        }
+
+        // Generate Flowers Array with Pastel Colors
+        const pastelColors = [0xf48fb1, 0xce93d8, 0xb39ddb, 0x90caf9, 0xffab91];
+        for (let i = 0; i < 25; i++) {
+            const angle = Math.random() * Math.PI * 2;
+            const radius = Math.random() * 8; // Keep within island
+            const x = Math.sin(angle) * radius;
+            const z = Math.cos(angle) * radius;
+            const color = pastelColors[Math.floor(Math.random() * pastelColors.length)];
+            createFlower(x, z, color);
+        }
+
+        // --- 4. BEE CREATION (SPAWN ON CLICK) ---
+        function createBee(position) {
+            const beeGroup = new THREE.Group();
+
+            // Body
+            const bodyGeo = new THREE.SphereGeometry(0.2, 16, 16);
+            bodyGeo.scale(1, 1, 1.3);
+            const bodyMat = new THREE.MeshStandardMaterial({ color: 0xffd54f, roughness: 0.4 });
+            const body = new THREE.Mesh(bodyGeo, bodyMat);
+            beeGroup.add(body);
+
+            // Stripes
+            const stripeGeo = new THREE.CylinderGeometry(0.205, 0.205, 0.1, 16);
+            const stripeMat = new THREE.MeshStandardMaterial({ color: 0x4e342e });
+            const stripe1 = new THREE.Mesh(stripeGeo, stripeMat);
+            stripe1.rotation.x = Math.PI / 2;
+            stripe1.position.z = 0.05;
+            beeGroup.add(stripe1);
+
+            // Wings
+            const wingGeo = new THREE.SphereGeometry(0.15, 16, 16);
+            wingGeo.scale(1, 0.1, 0.5);
+            const wingMat = new THREE.MeshStandardMaterial({ color: 0xffffff, transparent: true, opacity: 0.7 });
+            
+            const wingL = new THREE.Mesh(wingGeo, wingMat);
+            wingL.position.set(0.15, 0.15, 0);
+            wingL.rotation.z = 0.3;
+            beeGroup.add(wingL);
+
+            const wingR = new THREE.Mesh(wingGeo, wingMat);
+            wingR.position.set(-0.15, 0.15, 0);
+            wingR.rotation.z = -0.3;
+            beeGroup.add(wingR);
+
+            // Position & Setup Fly Animation Data
+            beeGroup.position.copy(position);
+            beeGroup.position.y += 0.5; // Spawn slightly above flower
+            beeGroup.scale.set(0.1, 0.1, 0.1); // Start small for pop effect
+
+            scene.add(beeGroup);
+
+            bees.push({
+                mesh: beeGroup,
+                wingL: wingL,
+                wingR: wingR,
+                targetY: beeGroup.position.y + 1.5 + Math.random(),
+                speed: 0.02 + Math.random() * 0.02,
+                angle: Math.random() * Math.PI * 2,
+                radius: 0.5 + Math.random() * 1.5,
+                centerPos: beeGroup.position.clone()
             });
+        }
 
-            // Frame dimensions matching artwork ratio (~1.4:1)
-            const artWidth = 3.5;
-            const artHeight = 2.5;
-            const frameThickness = 0.15;
+        // --- 5. RAYCASTING (INTERACTION) ---
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
 
-            // Outer Frame
-            const frameGeo = new THREE.BoxGeometry(artWidth + 0.3, artHeight + 0.3, frameThickness);
-            const frameMesh = new THREE.Mesh(frameGeo, goldMaterial);
-            galleryGroup.add(frameMesh);
+        window.addEventListener('pointerdown', (event) => {
+            // Prevent triggering when clicking on UI
+            if (event.clientX < 400 && event.clientY < 300) return;
 
-            // Canvas Artwork Plane
-            const artGeo = new THREE.PlaneGeometry(artWidth, artHeight);
-            const artMat = new THREE.MeshStandardMaterial({
-                map: texture,
-                roughness: 0.4
-            });
-            const artMesh = new THREE.Mesh(artGeo, artMat);
-            artMesh.position.z = frameThickness / 2 + 0.01;
-            galleryGroup.add(artMesh);
+            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
 
-            // Ornate Corner Details
-            const cornerGeo = new THREE.TorusGeometry(0.15, 0.04, 16, 32);
-            const corners = [
-                [-(artWidth/2), (artHeight/2)],
-                [(artWidth/2), (artHeight/2)],
-                [-(artWidth/2), -(artHeight/2)],
-                [(artWidth/2), -(artHeight/2)]
-            ];
+            raycaster.setFromCamera(mouse, camera);
+            const intersects = raycaster.intersectObjects(flowers);
 
-            corners.forEach(pos => {
-                const corner = new THREE.Mesh(cornerGeo, goldMaterial);
-                corner.position.set(pos[0], pos[1], frameThickness / 2 + 0.02);
-                galleryGroup.add(corner);
-            });
+            if (intersects.length > 0) {
+                const flowerCenter = intersects[0].object;
+                
+                // Animate Flower Bounce
+                const parent = flowerCenter.userData.parentGroup;
+                let scaleProgress = 0;
+                const animateFlower = () => {
+                    scaleProgress += 0.1;
+                    const scaleEffect = 1 + Math.sin(scaleProgress) * 0.2;
+                    parent.scale.set(scaleEffect, scaleEffect, scaleEffect);
+                    if (scaleProgress < Math.PI) {
+                        requestAnimationFrame(animateFlower);
+                    } else {
+                        parent.scale.set(1, 1, 1);
+                    }
+                };
+                animateFlower();
+
+                // Spawn Bee
+                const worldPos = new THREE.Vector3();
+                flowerCenter.getWorldPosition(worldPos);
+                createBee(worldPos);
+            }
         });
 
-        galleryGroup.position.set(1.2, 0.8, 0);
-        scene.add(galleryGroup);
-
-        // --- Wooden Easel Stand ---
-        const woodMaterial = new THREE.MeshStandardMaterial({ color: 0x5C3A21, roughness: 0.8 });
-        const easelGroup = new THREE.Group();
-        const legGeo = new THREE.CylinderGeometry(0.04, 0.04, 4.2);
-
-        const leftLeg = new THREE.Mesh(legGeo, woodMaterial);
-        leftLeg.position.set(-1.0, -0.6, -0.2);
-        leftLeg.rotation.z = -0.2;
-        easelGroup.add(leftLeg);
-
-        const rightLeg = new THREE.Mesh(legGeo, woodMaterial);
-        rightLeg.position.set(1.0, -0.6, -0.2);
-        rightLeg.rotation.z = 0.2;
-        easelGroup.add(rightLeg);
-
-        const backLeg = new THREE.Mesh(legGeo, woodMaterial);
-        backLeg.position.set(0, -0.6, -1.2);
-        backLeg.rotation.x = -0.3;
-        easelGroup.add(backLeg);
-
-        const shelfGeo = new THREE.BoxGeometry(3.6, 0.08, 0.3);
-        const shelf = new THREE.Mesh(shelfGeo, woodMaterial);
-        shelf.position.set(0, -0.6, 0.1);
-        easelGroup.add(shelf);
-
-        easelGroup.position.set(1.2, 0.8, 0);
-        scene.add(easelGroup);
-
-        // --- Animation Loop ---
+        // --- 6. ANIMATION LOOP ---
         let clock = new THREE.Clock();
 
         function animate() {
@@ -471,12 +349,28 @@
 
             const elapsedTime = clock.getElapsedTime();
 
-            // Gentle floating movement for the artwork and easel
-            galleryGroup.position.y = 0.8 + Math.sin(elapsedTime * 1.2) * 0.05;
-            galleryGroup.rotation.y = Math.sin(elapsedTime * 0.6) * 0.04;
-            
-            easelGroup.position.y = 0.8 + Math.sin(elapsedTime * 1.2) * 0.05;
-            easelGroup.rotation.y = Math.sin(elapsedTime * 0.6) * 0.04;
+            // Update Bees Animation
+            bees.forEach((bee) => {
+                // Scale up when spawned
+                if (bee.mesh.scale.x < 1) {
+                    bee.mesh.scale.addScalar(0.05);
+                }
+
+                // Flap wings fast
+                bee.wingL.rotation.z = 0.3 + Math.sin(elapsedTime * 30) * 0.3;
+                bee.wingR.rotation.z = -0.3 - Math.sin(elapsedTime * 30) * 0.3;
+
+                // Fly in small circles around spawning flower
+                bee.angle += bee.speed;
+                bee.mesh.position.x = bee.centerPos.x + Math.cos(bee.angle) * bee.radius;
+                bee.mesh.position.z = bee.centerPos.z + Math.sin(bee.angle) * bee.radius;
+                
+                // Floating Up and Down
+                bee.mesh.position.y = bee.targetY + Math.sin(elapsedTime * 3 + bee.angle) * 0.3;
+
+                // Rotate bee towards movement direction
+                bee.mesh.rotation.y = -bee.angle + Math.PI / 2;
+            });
 
             controls.update();
             renderer.render(scene, camera);
@@ -484,7 +378,7 @@
 
         animate();
 
-        // Responsive Resize
+        // --- 7. RESPONSIVE RESIZE ---
         window.addEventListener('resize', () => {
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
