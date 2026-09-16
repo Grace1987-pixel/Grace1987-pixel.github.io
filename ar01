@@ -14,7 +14,7 @@
   device-orientation-permission-ui="enabled: false">
 
   <a-assets>
-    <a-asset-item id="model0" src="https://aitutorialcourse.github.io/epona.glb"></a-asset-item>
+    <a-asset-item id="model0" src="https://Grace1987-pixel.github.io/toon_cat_free.glb"></a-asset-item>
 
   </a-assets>
 
