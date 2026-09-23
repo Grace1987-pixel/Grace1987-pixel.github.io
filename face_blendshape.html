@@ -34,7 +34,7 @@
     roomEnvironment.dispose();
     pmremGenerator.dispose();
     scene.add(new THREE.HemisphereLight(0xffffff, 0xbbbbff, 1));
-    const model = await new GLTFLoader().loadAsync('Grace1987-pixel.github.io/face05.glb.glb');
+    const model = await new GLTFLoader().loadAsync('https://Grace1987-pixel.github.io/face05.glb');
     
     model.scene.scale.setScalar(2);
     mindar.addAnchor(1).group.add(model.scene);
